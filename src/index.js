@@ -1,8 +1,6 @@
 // FETCH
 
-// HANDLERS
-
-function handlePostUser(e) {
+function postUser(e) {
   e.preventDefault();
   fetch("http://localhost:3000/users", {
     method: "POST",
@@ -26,13 +24,15 @@ function handlePostUser(e) {
     .catch((error) => console.log(error));
 }
 
-function handleGetUser(e) {
+function getUser(e) {
   e.preventDefault();
   fetch(`http://localhost:3000/users/${e.target.username.value}`)
     .then((resp) => resp.json())
     .then((user) => console.log(user))
     .catch((error) => console.log(error));
 }
+
+// HANDLERS
 
 // LISTENERS
 
@@ -111,9 +111,9 @@ function renderSignUp(e) {
 
   form.addEventListener("submit", (event) => {
     if (e.target.innerText === "Sign Up") {
-      handlePostUser(event);
+      postUser(event);
     } else {
-      handleGetUser(event);
+      getUser(event);
     }
   });
 
