@@ -139,11 +139,7 @@ function deleteNote(note) {
 document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderPage();
-
-  // redo later
-  const calendar = document.createElement("div");
-  calendar.className = "auto-jsCalendar clean-theme blue mt-4";
-  document.querySelector(".container").appendChild(calendar);
+  renderCalendar();
 });
 
 // DOM
@@ -228,4 +224,10 @@ function renderPage() {
   page.className = "container";
 
   document.body.appendChild(page);
+}
+
+function renderCalendar() {
+  const calendar = document.createElement("div");
+  calendar.className = "auto-jsCalendar clean-theme blue mt-4";
+  document.querySelector(".container").appendChild(calendar);
 }
