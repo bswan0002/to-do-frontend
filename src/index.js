@@ -15,7 +15,14 @@ function handlePostUser(e) {
     }),
   })
     .then((resp) => resp.json())
-    .then((user) => console.log(user))
+    .then((user) => {
+      if (user.id) {
+        debugger;
+        console.log(user);
+      } else {
+        console.log("Nope");
+      }
+    })
     .catch((error) => console.log(error));
 }
 
