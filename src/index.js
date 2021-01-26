@@ -18,7 +18,7 @@ function postUser(e) {
         debugger;
         console.log(user);
       } else {
-        console.log("Nope");
+        alert("Username already taken");
       }
     })
     .catch((error) => console.log(error));
@@ -32,6 +32,106 @@ function getUser(e) {
     .catch((error) => console.log(error));
 }
 
+function postTask(e) {
+  e.preventDefault();
+  fetch("http://localhost:3000/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      title: e.target,
+      description: e.target,
+      due_date: e.target,
+      priority_level: e.target,
+      duration: e.target,
+      user_id: e.target,
+    }),
+  })
+    .then((resp) => resp.json())
+    .then((task) => console.log(task))
+    .catch((error) => console.log(error));
+}
+function updateTask(e) {
+  e.preventDefault();
+  fetch(`http://localhost:3000/tasks/${e.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      title: e.target,
+      description: e.target,
+      due_date: e.target,
+      priority_level: e.target,
+      duration: e.target,
+      user_id: e.target,
+    }),
+  })
+    .then((resp) => resp.json())
+    .then((task) => console.log(task))
+    .catch((error) => console.log(error));
+}
+
+function deleteTask(task) {
+  fetch(`http://localhost:3000/tasks/${task.id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+}
+
+function postNote(e) {
+  e.preventDefault();
+  fetch("http://localhost:3000/notes", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      title: e.target,
+      body: e.target,
+      user_id: e.target,
+    }),
+  })
+    .then((resp) => resp.json())
+    .then((user) => console.log(user))
+    .catch((error) => console.log(error));
+}
+
+function updateNote(e) {
+  e.preventDefault();
+  fetch(`http://localhost:3000/notes/${e.id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      title: e.target,
+      body: e.target,
+      user_id: e.target,
+    }),
+  })
+    .then((resp) => resp.json())
+    .then((user) => console.log(user))
+    .catch((error) => console.log(error));
+}
+
+function deleteNote(note) {
+  fetch(`http://localhost:3000/notes/${note.id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+}
 // HANDLERS
 
 // LISTENERS
