@@ -26,7 +26,20 @@
       crossorigin="anonymous"
     />
 
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles/styles.css" />
+    <link id="cal-style" rel="stylesheet" href="styles/big-cal.css" />
+    <script>
+      function layoutHandler() {
+        const styleLink = document.getElementById("cal-style");
+        if (window.innerWidth < 1000) {
+          styleLink.setAttribute("href", "styles/mobile-cal.css");
+        } else {
+          styleLink.setAttribute("href", "styles/big-cal.css");
+        }
+      }
+      window.onresize = layoutHandler;
+      layoutHandler();
+    </script>
 
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link

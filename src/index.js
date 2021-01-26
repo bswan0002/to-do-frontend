@@ -362,5 +362,6 @@ function renderPage() {
 function renderCalendar() {
   const calendar = document.createElement("div");
   calendar.className = "auto-jsCalendar clean-theme blue mt-4";
+  calendar.dataset.monthFormat = "month YYYY";
   document.querySelector(".container").appendChild(calendar);
 }

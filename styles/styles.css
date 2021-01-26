@@ -11,13 +11,11 @@
 }
 
 /* Clean Theme */
-.jsCalendar.clean-theme table {
-  background-color: transparent;
-  box-shadow: none;
-  color: #000000;
-  font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
-  width: 100%;
+
+.jsCalendar * {
+  margin: 0 auto !important;
 }
+
 .jsCalendar.clean-theme thead .jsCalendar-title-name {
   font-weight: bold;
 }
@@ -33,15 +31,7 @@
 .jsCalendar.clean-theme thead .jsCalendar-week-days th {
   font-weight: bold;
 }
-.jsCalendar.clean-theme thead .jsCalendar-week-days th,
-.jsCalendar.clean-theme tbody td {
-  border-radius: unset;
-  font-size: 14px;
-  height: 70px;
-  line-height: 42px;
-  margin: 2px 2px;
-  width: 70px;
-}
+
 .jsCalendar.clean-theme tbody td:hover {
   background-color: #f0f0f0;
   color: #000000;
