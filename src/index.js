@@ -15,8 +15,8 @@ function postUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user.id) {
-        debugger;
-        console.log(user);
+        renderTaskForm(user);
+        renderTaskList(user);
       } else {
         alert("Username already taken");
       }
@@ -28,11 +28,14 @@ function getUser(e) {
   e.preventDefault();
   fetch(`http://localhost:3000/users/${e.target.username.value}`)
     .then((resp) => resp.json())
-    .then((user) => console.log(user))
+    .then((user) => {
+      renderTaskForm(user);
+      renderTaskList(user);
+    })
     .catch((error) => console.log(error));
 }
 
-function postTask(e) {
+function postTask(e, user) {
   e.preventDefault();
   fetch("http://localhost:3000/tasks", {
     method: "POST",
@@ -41,16 +44,19 @@ function postTask(e) {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      title: e.target,
-      description: e.target,
-      due_date: e.target,
-      priority_level: e.target,
-      duration: e.target,
-      user_id: e.target,
+      title: e.target.title.value,
+      description: e.target.description.value,
+      due_date: e.target.due_date.value,
+      priority_level: e.target.priority_level.value,
+      duration: parseInt(e.target.duration.value),
+      user_id: user.id,
     }),
   })
     .then((resp) => resp.json())
-    .then((task) => console.log(task))
+    .then((task) => {
+      renderTask(task);
+      e.target.reset();
+    })
     .catch((error) => console.log(error));
 }
 function updateTask(e) {
@@ -62,16 +68,16 @@ function updateTask(e) {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      title: e.target,
-      description: e.target,
-      due_date: e.target,
-      priority_level: e.target,
-      duration: e.target,
-      user_id: e.target,
+      title: e.target.title.value,
+      description: e.target.description.value,
+      due_date: e.target.due_date.value,
+      priority_level: e.target.priority_level.value,
+      duration: e.target.duration.value,
+      user_id: user.id,
     }),
   })
     .then((resp) => resp.json())
-    .then((task) => console.log(task))
+    .then((task) => renderTaskList(user))
     .catch((error) => console.log(error));
 }
 
@@ -143,6 +149,105 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // DOM
+function renderTaskList(user) {
+  const div = document.querySelector(".justify-content-around");
+  const innerDiv = document.createElement("div");
+  innerDiv.className = "col-4 mt-4";
+  const header = document.createElement("h2");
+  header.textContent = "Task List";
+  const ul = document.createElement("ul");
+  ul.id = "task-list";
+  innerDiv.append(header, ul);
+  div.appendChild(innerDiv);
+  user.tasks.forEach((task) => {
+    renderTask(task);
+  });
+}
+
+function renderTask(task) {
+  const ul = document.getElementById("task-list");
+  const li = document.createElement("li");
+  li.textContent = task.title;
+  ul.appendChild(li);
+}
+function renderTaskForm(user) {
+  const page = document.querySelector(".container");
+  document.querySelector("form").remove();
+  const outerDiv = document.createElement("div");
+  outerDiv.setAttribute("class", "row justify-content-around");
+  const innerDiv = document.createElement("div");
+  innerDiv.className = "col-4";
+  const form = document.createElement("form");
+  form.className = "mt-4";
+  const formDiv = document.createElement("div");
+
+  const formTitle = document.createElement("h2");
+  formTitle.innerText = "Create New Task";
+
+  const titleLabel = document.createElement("label");
+  titleLabel.className = "form-label";
+  titleLabel.innerText = "Title";
+
+  const titleInput = document.createElement("input");
+  titleInput.className = "form-control mb-2";
+  titleInput.setAttribute("name", "title");
+
+  const descriptionLabel = document.createElement("label");
+  descriptionLabel.className = "form-label";
+  descriptionLabel.innerText = "Description";
+
+  const descriptionInput = document.createElement("input");
+  descriptionInput.className = "form-control mb-2";
+  descriptionInput.setAttribute("name", "description");
+
+  const dateLabel = document.createElement("label");
+  dateLabel.className = "form-label";
+  dateLabel.innerText = "Due Date";
+
+  const dateInput = document.createElement("input");
+  dateInput.className = "form-control mb-2";
+  dateInput.setAttribute("name", "due_date");
+
+  const priorityLabel = document.createElement("label");
+  priorityLabel.className = "form-label";
+  priorityLabel.innerText = "Priority Level";
+
+  const priorityInput = document.createElement("input");
+  priorityInput.className = "form-control mb-2";
+  priorityInput.setAttribute("name", "priority_level");
+
+  const durationLabel = document.createElement("label");
+  durationLabel.className = "form-label";
+  durationLabel.innerText = "Estimated Duration";
+
+  const durationInput = document.createElement("input");
+  durationInput.className = "form-control mb-2";
+  durationInput.setAttribute("name", "duration");
+
+  const submit = document.createElement("button");
+  submit.className = "btn btn-primary";
+  submit.innerText = "Submit";
+  formDiv.append(
+    formTitle,
+    titleLabel,
+    titleInput,
+    descriptionLabel,
+    descriptionInput,
+    dateLabel,
+    dateInput,
+    priorityLabel,
+    priorityInput,
+    durationLabel,
+    durationInput,
+    submit
+  );
+  form.appendChild(formDiv);
+  form.addEventListener("submit", (e) => postTask(e, user));
+  const calendar = document.querySelector(".auto-jsCalendar");
+  innerDiv.appendChild(form);
+  outerDiv.appendChild(innerDiv);
+  page.insertBefore(outerDiv, calendar);
+}
 
 function renderHeader() {
   const nav = document.createElement("nav");
@@ -185,7 +290,9 @@ function renderHeader() {
 
 function renderSignUp(e) {
   const page = document.querySelector(".container");
-  page.innerHTML = "";
+  if (document.querySelector("form")) {
+    document.querySelector("form").remove();
+  }
 
   const form = document.createElement("form");
   form.className = "mt-4";
@@ -213,10 +320,10 @@ function renderSignUp(e) {
       getUser(event);
     }
   });
-
+  const calendar = document.querySelector(".auto-jsCalendar");
   formDiv.append(formTitle, uLabel, uInput, submit);
   form.appendChild(formDiv);
-  page.appendChild(form);
+  page.insertBefore(form, calendar);
 }
 
 function renderPage() {
@@ -230,4 +337,15 @@ function renderCalendar() {
   const calendar = document.createElement("div");
   calendar.className = "auto-jsCalendar clean-theme blue mt-4";
   document.querySelector(".container").appendChild(calendar);
+}
+
+//  <div class="row justify-content-around">
+{
+  /* <div class="col-4">
+One of two columns
+</div>
+<div class="col-4">
+One of two columns
+</div>
+</div> */
 }
