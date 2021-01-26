@@ -3,12 +3,28 @@
 // HANDLERS
 
 function handlePostUser(e) {
-  debugger;
+  e.preventDefault();
+  fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      username: e.target.username.value,
+    }),
+  })
+    .then((resp) => resp.json())
+    .then((user) => console.log(user))
+    .catch((error) => console.log(error));
 }
 
 function handleGetUser(e) {
-  console.log("we're getting now");
-  debugger;
+  e.preventDefault();
+  fetch(`http://localhost:3000/users/${e.target.username.value}`)
+    .then((resp) => resp.json())
+    .then((user) => console.log(user))
+    .catch((error) => console.log(error));
 }
 
 // LISTENERS
