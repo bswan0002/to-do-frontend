@@ -81,14 +81,17 @@ function updateTask(e) {
     .catch((error) => console.log(error));
 }
 
-function deleteTask(task) {
-  fetch(`http://localhost:3000/tasks/${task.id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-  });
+function deleteTask(event) {
+  fetch(
+    `http://localhost:3000/tasks/${event.target.parentElement.dataset.id}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    }
+  ).then(event.target.parentElement.remove());
 }
 
 function postNote(e) {
@@ -139,7 +142,16 @@ function deleteNote(note) {
   });
 }
 // HANDLERS
-
+function handleDate(date) {
+  let time = date.split("-");
+  let month = time[0].slice(2);
+  let day = time[1];
+  let year = time[2].slice(0, 2);
+  return `${month}-${day}-${year}`;
+}
+function handleEditTask(event) {
+  debugger;
+}
 // LISTENERS
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -157,6 +169,7 @@ function renderTaskList(user) {
   header.textContent = "Task List";
   const ul = document.createElement("ul");
   ul.id = "task-list";
+  ul.className = "list-group";
   innerDiv.append(header, ul);
   div.appendChild(innerDiv);
   user.tasks.forEach((task) => {
@@ -167,7 +180,18 @@ function renderTaskList(user) {
 function renderTask(task) {
   const ul = document.getElementById("task-list");
   const li = document.createElement("li");
-  li.textContent = task.title;
+  li.textContent = `${task.title} | ${handleDate(task.due_date)}`;
+  li.dataset.id = task.id;
+  li.className = "list-group-item";
+  const deleteBTN = document.createElement("button");
+  const editBTN = document.createElement("button");
+  deleteBTN.textContent = "Delete";
+  deleteBTN.className = "btn btn-danger";
+  deleteBTN.addEventListener("click", deleteTask);
+  editBTN.textContent = "Edit";
+  editBTN.className = "btn btn-success";
+  editBTN.addEventListener("click", handleEditTask);
+  li.append(editBTN, deleteBTN);
   ul.appendChild(li);
 }
 function renderTaskForm(user) {
@@ -205,7 +229,9 @@ function renderTaskForm(user) {
   dateLabel.innerText = "Due Date";
 
   const dateInput = document.createElement("input");
-  dateInput.className = "form-control mb-2";
+  dateInput.className = "form-control mb-2 datepicker";
+  dateInput.setAttribute("type", "text");
+  dateInput.placeholder = "Select Date";
   dateInput.setAttribute("name", "due_date");
 
   const priorityLabel = document.createElement("label");
@@ -337,15 +363,4 @@ function renderCalendar() {
   const calendar = document.createElement("div");
   calendar.className = "auto-jsCalendar clean-theme blue mt-4";
   document.querySelector(".container").appendChild(calendar);
-}
-
-//  <div class="row justify-content-around">
-{
-  /* <div class="col-4">
-One of two columns
-</div>
-<div class="col-4">
-One of two columns
-</div>
-</div> */
 }
