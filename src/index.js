@@ -142,8 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // redo later
   const calendar = document.createElement("div");
-  calendar.className = "auto-jsCalendar";
-  document.body.appendChild(calendar);
+  calendar.className = "auto-jsCalendar clean-theme blue mt-4";
+  document.querySelector(".container").appendChild(calendar);
 });
 
 // DOM
@@ -157,7 +157,8 @@ function renderHeader() {
 
   const titleDiv = document.createElement("div");
   const title = document.createElement("h1");
-  title.innerText = "To-do: come up with name";
+  title.className = "title";
+  title.innerHTML = `<span class = "orange">await</span><span class = "blue"> noMore</span>();`;
   titleDiv.appendChild(title);
 
   const navUl = document.createElement("ul");
