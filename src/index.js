@@ -439,17 +439,6 @@ function renderDurationBar() {
   // make svg
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-<<<<<<< HEAD
-  let percentage = 10;
-  // make a simple rectangle
-  const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  bar.setAttribute("width", "100%");
-  bar.setAttribute("height", `${percentage}%`);
-  bar.setAttribute("y", `${92 * (1 - percentage / 100)}`);
-  bar.setAttribute("fill", `${colors["High"]}`);
-  bar.setAttribute("fill-opacity", "0.5");
-  svg.appendChild(bar);
-=======
   let highPercentage = 10;
   let medPercentage = 15;
   let lowPercentage = 35;
@@ -486,7 +475,6 @@ function renderDurationBar() {
   lowBar.setAttribute("fill-opacity", "0.6");
 
   svg.append(highBar, medBar, lowBar);
->>>>>>> ben
   document.body.appendChild(svg);
   // put bar in cal
   const dayOne = Array.from(document.querySelectorAll("tbody td")).find(
