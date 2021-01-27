@@ -1,8 +1,8 @@
 // Global Variables
 let colors = {
-  High: "rgba(255, 0, 0, .5)",
-  Medium: "rgba(255, 165, 0, 0.5)",
-  Low: "rgba(255, 255, 0, 0.5)",
+  High: "rgba(160, 32, 240, 0.65)",
+  Medium: "rgba(0, 60, 255, 0.65)",
+  Low: "rgba(0, 140, 0, 0.65)",
 };
 // FETCH
 
@@ -439,17 +439,6 @@ function renderDurationBar() {
   // make svg
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-<<<<<<< HEAD
-  let percentage = 10;
-  // make a simple rectangle
-  const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  bar.setAttribute("width", "100%");
-  bar.setAttribute("height", `${percentage}%`);
-  bar.setAttribute("y", `${92 * (1 - percentage / 100)}`);
-  bar.setAttribute("fill", `${colors["High"]}`);
-  bar.setAttribute("fill-opacity", "0.5");
-  svg.appendChild(bar);
-=======
   let highPercentage = 10;
   let medPercentage = 15;
   let lowPercentage = 35;
@@ -464,8 +453,7 @@ function renderDurationBar() {
   highBar.setAttribute("width", "100%");
   highBar.setAttribute("height", `${highPercentage}%`);
   highBar.setAttribute("y", `${92 * (1 - highPercentage / 100)}`);
-  highBar.setAttribute("fill", "purple");
-  highBar.setAttribute("fill-opacity", "0.6");
+  highBar.setAttribute("fill", `${colors["High"]}`);
 
   medBar.setAttribute("width", "100%");
   medBar.setAttribute("height", `${medPercentage}%`);
@@ -473,8 +461,7 @@ function renderDurationBar() {
     "y",
     `${92 * (1 - (highPercentage + medPercentage) / 100)}`
   );
-  medBar.setAttribute("fill", "blue");
-  medBar.setAttribute("fill-opacity", "0.6");
+  medBar.setAttribute("fill", `${colors["Medium"]}`);
 
   lowBar.setAttribute("width", "100%");
   lowBar.setAttribute("height", `${lowPercentage}%`);
@@ -482,11 +469,9 @@ function renderDurationBar() {
     "y",
     `${92 * (1 - (highPercentage + medPercentage + lowPercentage) / 100)}`
   );
-  lowBar.setAttribute("fill", "green");
-  lowBar.setAttribute("fill-opacity", "0.6");
+  lowBar.setAttribute("fill", `${colors["Low"]}`);
 
   svg.append(highBar, medBar, lowBar);
->>>>>>> ben
   document.body.appendChild(svg);
   // put bar in cal
   const dayOne = Array.from(document.querySelectorAll("tbody td")).find(
