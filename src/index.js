@@ -183,6 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPage();
   renderCalendar();
   setTimeout(renderDurationBar, 500);
+  setTimeout(addMonthEvent, 500);
 });
 
 // DOM
@@ -438,6 +439,7 @@ function renderDurationBar() {
   // make svg
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
+<<<<<<< HEAD
   let percentage = 10;
   // make a simple rectangle
   const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -447,10 +449,56 @@ function renderDurationBar() {
   bar.setAttribute("fill", `${colors["High"]}`);
   bar.setAttribute("fill-opacity", "0.5");
   svg.appendChild(bar);
+=======
+  let highPercentage = 10;
+  let medPercentage = 15;
+  let lowPercentage = 35;
+  // make rectangles
+  const highBar = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "rect"
+  );
+  const medBar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  const lowBar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+  highBar.setAttribute("width", "100%");
+  highBar.setAttribute("height", `${highPercentage}%`);
+  highBar.setAttribute("y", `${92 * (1 - highPercentage / 100)}`);
+  highBar.setAttribute("fill", "purple");
+  highBar.setAttribute("fill-opacity", "0.6");
+
+  medBar.setAttribute("width", "100%");
+  medBar.setAttribute("height", `${medPercentage}%`);
+  medBar.setAttribute(
+    "y",
+    `${92 * (1 - (highPercentage + medPercentage) / 100)}`
+  );
+  medBar.setAttribute("fill", "blue");
+  medBar.setAttribute("fill-opacity", "0.6");
+
+  lowBar.setAttribute("width", "100%");
+  lowBar.setAttribute("height", `${lowPercentage}%`);
+  lowBar.setAttribute(
+    "y",
+    `${92 * (1 - (highPercentage + medPercentage + lowPercentage) / 100)}`
+  );
+  lowBar.setAttribute("fill", "green");
+  lowBar.setAttribute("fill-opacity", "0.6");
+
+  svg.append(highBar, medBar, lowBar);
+>>>>>>> ben
   document.body.appendChild(svg);
   // put bar in cal
   const dayOne = Array.from(document.querySelectorAll("tbody td")).find(
-    (el) => el.textContent === "1"
+    (el) => el.textContent === "26"
   );
   dayOne.appendChild(svg);
+}
+
+function addMonthEvent() {
+  const navLeft = document.querySelector(".jsCalendar-nav-left");
+  const navRight = document.querySelector(".jsCalendar-nav-right");
+
+  navLeft.addEventListener("click", renderDurationBar);
+  navRight.addEventListener("click", renderDurationBar);
 }

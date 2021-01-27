@@ -10,7 +10,7 @@
 .jsCalendar.clean-theme tbody td {
   border-radius: unset;
   font-size: 14px;
-  height: 50px;
+  height: 100px;
   line-height: 42px;
   margin: 2px 2px;
   width: 50px;
@@ -18,9 +18,9 @@
 
 svg {
   height: 92px;
-  width: 20px;
+  width: 10px;
   position: absolute;
-  right: 4px;
-  bottom: 4px;
+  right: 2px;
+  bottom: 2px;
   z-index: -1;
 }
