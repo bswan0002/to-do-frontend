@@ -1,3 +1,9 @@
+// Global Variables
+let colors = {
+  High: "rgba(255, 0, 0, .5)",
+  Medium: "rgba(255, 165, 0, 0.5)",
+  Low: "rgba(255, 255, 0, 0.5)",
+};
 // FETCH
 
 function postUser(e) {
@@ -18,6 +24,7 @@ function postUser(e) {
         document.querySelector("form").remove();
         renderTaskForm(user.id);
         renderTaskList(user);
+        updateHeader();
       } else {
         alert("Username already taken");
       }
@@ -34,6 +41,7 @@ function getUser(e) {
         document.querySelector("form").remove();
         renderTaskForm(user.id);
         renderTaskList(user);
+        updateHeader();
       } else {
         alert("Invalid Username");
       }
@@ -164,6 +172,10 @@ function handleEditTask(event, task) {
   document.getElementById("task_form").innerHTML = "";
   renderTaskForm(event.target.dataset.id, task);
 }
+
+function handleReloadPage() {
+  location.reload();
+}
 // LISTENERS
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -174,15 +186,26 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // DOM
+function updateHeader() {
+  document.querySelector("ul.nav").children[0].remove();
+  let signOut = document.querySelector("ul.nav").firstChild;
+  signOut.innerHTML = "";
+  let button = document.createElement("button");
+  button.className = "btn";
+  button.textContent = "Sign Out";
+  button.addEventListener("click", handleReloadPage);
+  signOut.appendChild(button);
+}
 function renderTaskList(user) {
   const div = document.querySelector(".justify-content-around");
   const innerDiv = document.createElement("div");
-  innerDiv.className = "col-4 mt-4";
+  innerDiv.className = "col-md mt-4";
+  innerDiv.id = "task-div";
   const header = document.createElement("h2");
   header.textContent = "Task List";
   const ul = document.createElement("ul");
   ul.id = "task-list";
-  ul.className = "list-group";
+  ul.className = "list-group overflow-auto";
   innerDiv.append(header, ul);
   div.appendChild(innerDiv);
   user.tasks.forEach((task) => {
@@ -203,6 +226,7 @@ function renderTask(task) {
     li.innerHTML = "";
   }
   li.textContent = `${task.title} | ${handleDate(task.due_date)}`;
+  li.style.backgroundColor = `${colors[task.priority_level]}`;
   const deleteBTN = document.createElement("button");
   const editBTN = document.createElement("button");
   deleteBTN.textContent = "Delete";
@@ -222,7 +246,7 @@ function renderTaskForm(user_id, task = null) {
     outerDiv = document.createElement("div");
     outerDiv.setAttribute("class", "row justify-content-around");
     innerDiv = document.createElement("div");
-    innerDiv.className = "col-4";
+    innerDiv.className = "col-md";
     innerDiv.id = "task_form";
   } else {
     outerDiv = document.querySelector(".justify-content-around");
@@ -279,7 +303,7 @@ function renderTaskForm(user_id, task = null) {
 
   const durationLabel = document.createElement("label");
   durationLabel.className = "form-label";
-  durationLabel.innerText = "Estimated Duration";
+  durationLabel.innerText = "Estimated Duration (minutes)";
 
   const durationInput = document.createElement("input");
   durationInput.className = "form-control mb-2";
@@ -420,7 +444,7 @@ function renderDurationBar() {
   bar.setAttribute("width", "100%");
   bar.setAttribute("height", `${percentage}%`);
   bar.setAttribute("y", `${92 * (1 - percentage / 100)}`);
-  bar.setAttribute("fill", "red");
+  bar.setAttribute("fill", `${colors["High"]}`);
   bar.setAttribute("fill-opacity", "0.5");
   svg.appendChild(bar);
   document.body.appendChild(svg);

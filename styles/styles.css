@@ -10,6 +10,13 @@
   color: rgb(14, 184, 8);
 }
 
+.justify-content-around {
+  /* max-height: 60vh; */
+}
+
+#task-list {
+  max-height: 45vh;
+}
 /* Clean Theme */
 
 .jsCalendar * {
