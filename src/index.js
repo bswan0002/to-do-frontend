@@ -15,7 +15,7 @@ function postUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user.id) {
-        renderTaskForm(user);
+        renderTaskForm(user.id);
         renderTaskList(user);
       } else {
         alert("Username already taken");
@@ -29,13 +29,14 @@ function getUser(e) {
   fetch(`http://localhost:3000/users/${e.target.username.value}`)
     .then((resp) => resp.json())
     .then((user) => {
-      renderTaskForm(user);
+      document.querySelector("form").remove();
+      renderTaskForm(user.id);
       renderTaskList(user);
     })
     .catch((error) => console.log(error));
 }
 
-function postTask(e, user) {
+function postTask(e, user_id) {
   e.preventDefault();
   fetch("http://localhost:3000/tasks", {
     method: "POST",
@@ -49,19 +50,21 @@ function postTask(e, user) {
       due_date: e.target.due_date.value,
       priority_level: e.target.priority_level.value,
       duration: parseInt(e.target.duration.value),
-      user_id: user.id,
+      user_id: user_id,
     }),
   })
     .then((resp) => resp.json())
     .then((task) => {
-      renderTask(task);
+      task.id !== null ? renderTask(task) : alert("Invalid Task Submission");
       e.target.reset();
     })
     .catch((error) => console.log(error));
 }
-function updateTask(e) {
+function updateTask(e, user_id, task_id) {
   e.preventDefault();
-  fetch(`http://localhost:3000/tasks/${e.id}`, {
+  document.getElementById("task_form").innerHTML = "";
+  renderTaskForm(user_id);
+  fetch(`http://localhost:3000/tasks/${task_id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -72,12 +75,15 @@ function updateTask(e) {
       description: e.target.description.value,
       due_date: e.target.due_date.value,
       priority_level: e.target.priority_level.value,
-      duration: e.target.duration.value,
-      user_id: user.id,
+      duration: parseInt(e.target.duration.value),
+      user_id: user_id,
     }),
   })
     .then((resp) => resp.json())
-    .then((task) => renderTaskList(user))
+    .then((task) => {
+      console.log(task);
+      renderTask(task);
+    })
     .catch((error) => console.log(error));
 }
 
@@ -144,13 +150,14 @@ function deleteNote(note) {
 // HANDLERS
 function handleDate(date) {
   let time = date.split("-");
-  let month = time[0].slice(2);
-  let day = time[1];
-  let year = time[2].slice(0, 2);
+  let year = time[0];
+  let month = time[1];
+  let day = time[2].slice(0, 2);
   return `${month}-${day}-${year}`;
 }
-function handleEditTask(event) {
-  debugger;
+function handleEditTask(event, task) {
+  document.getElementById("task_form").innerHTML = "";
+  renderTaskForm(event.target.dataset.id, task);
 }
 // LISTENERS
 
@@ -179,34 +186,48 @@ function renderTaskList(user) {
 
 function renderTask(task) {
   const ul = document.getElementById("task-list");
-  const li = document.createElement("li");
+  let li;
+  if (document.querySelector(`[data-id="${task.id}"]`) === null) {
+    li = document.createElement("li");
+    li.dataset.id = task.id;
+    li.className = "list-group-item";
+    ul.appendChild(li);
+  } else {
+    li = document.querySelector(`[data-id="${task.id}"]`);
+    li.innerHTML = "";
+  }
   li.textContent = `${task.title} | ${handleDate(task.due_date)}`;
-  li.dataset.id = task.id;
-  li.className = "list-group-item";
   const deleteBTN = document.createElement("button");
   const editBTN = document.createElement("button");
   deleteBTN.textContent = "Delete";
   deleteBTN.className = "btn btn-danger";
   deleteBTN.addEventListener("click", deleteTask);
   editBTN.textContent = "Edit";
+  editBTN.dataset.id = task.user_id;
   editBTN.className = "btn btn-success";
-  editBTN.addEventListener("click", handleEditTask);
+  editBTN.addEventListener("click", (e) => handleEditTask(e, task));
   li.append(editBTN, deleteBTN);
-  ul.appendChild(li);
 }
-function renderTaskForm(user) {
+function renderTaskForm(user_id, task = null) {
   const page = document.querySelector(".container");
-  document.querySelector("form").remove();
-  const outerDiv = document.createElement("div");
-  outerDiv.setAttribute("class", "row justify-content-around");
-  const innerDiv = document.createElement("div");
-  innerDiv.className = "col-4";
+  let outerDiv;
+  let innerDiv;
+  if (document.querySelector(".justify-content-around") === null) {
+    outerDiv = document.createElement("div");
+    outerDiv.setAttribute("class", "row justify-content-around");
+    innerDiv = document.createElement("div");
+    innerDiv.className = "col-4";
+    innerDiv.id = "task_form";
+  } else {
+    outerDiv = document.querySelector(".justify-content-around");
+    innerDiv = document.getElementById("task_form");
+  }
   const form = document.createElement("form");
   form.className = "mt-4";
   const formDiv = document.createElement("div");
 
   const formTitle = document.createElement("h2");
-  formTitle.innerText = "Create New Task";
+  formTitle.textContent = task === null ? "Create New Task" : "Edit Task";
 
   const titleLabel = document.createElement("label");
   titleLabel.className = "form-label";
@@ -231,7 +252,7 @@ function renderTaskForm(user) {
   const dateInput = document.createElement("input");
   dateInput.className = "form-control mb-2 datepicker";
   dateInput.setAttribute("type", "text");
-  dateInput.placeholder = "Select Date";
+  dateInput.placeholder = "MM-DD-YYYY";
   dateInput.setAttribute("name", "due_date");
 
   const priorityLabel = document.createElement("label");
@@ -249,7 +270,13 @@ function renderTaskForm(user) {
   const durationInput = document.createElement("input");
   durationInput.className = "form-control mb-2";
   durationInput.setAttribute("name", "duration");
-
+  if (task !== null) {
+    titleInput.value = task.title;
+    descriptionInput.value = task.description;
+    dateInput.value = handleDate(task.due_date);
+    priorityInput.value = task.priority_level;
+    durationInput.value = task.duration;
+  }
   const submit = document.createElement("button");
   submit.className = "btn btn-primary";
   submit.innerText = "Submit";
@@ -268,10 +295,13 @@ function renderTaskForm(user) {
     submit
   );
   form.appendChild(formDiv);
-  form.addEventListener("submit", (e) => postTask(e, user));
+  form.addEventListener("submit", (e) => {
+    task === null ? postTask(e, user_id) : updateTask(e, user_id, task.id);
+  });
   const calendar = document.querySelector(".auto-jsCalendar");
   innerDiv.appendChild(form);
-  outerDiv.appendChild(innerDiv);
+  let task_list = document.querySelector("#task-list");
+  task_list === null ? outerDiv.appendChild(innerDiv) : null;
   page.insertBefore(outerDiv, calendar);
 }
 
