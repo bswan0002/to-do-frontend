@@ -15,6 +15,7 @@ function postUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user.id) {
+        document.querySelector("form").remove();
         renderTaskForm(user.id);
         renderTaskList(user);
       } else {
@@ -29,9 +30,13 @@ function getUser(e) {
   fetch(`http://localhost:3000/users/${e.target.username.value}`)
     .then((resp) => resp.json())
     .then((user) => {
-      document.querySelector("form").remove();
-      renderTaskForm(user.id);
-      renderTaskList(user);
+      if (user) {
+        document.querySelector("form").remove();
+        renderTaskForm(user.id);
+        renderTaskList(user);
+      } else {
+        alert("Invalid Username");
+      }
     })
     .catch((error) => console.log(error));
 }
@@ -259,8 +264,16 @@ function renderTaskForm(user_id, task = null) {
   priorityLabel.className = "form-label";
   priorityLabel.innerText = "Priority Level";
 
-  const priorityInput = document.createElement("input");
+  const priorityInput = document.createElement("select");
   priorityInput.className = "form-control mb-2";
+  const optionNone = document.createElement("option");
+  const optionHigh = document.createElement("option");
+  optionHigh.textContent = "High";
+  const optionLow = document.createElement("option");
+  optionLow.textContent = "Low";
+  const optionMed = document.createElement("option");
+  optionMed.textContent = "Medium";
+  priorityInput.append(optionNone, optionHigh, optionMed, optionLow);
   priorityInput.setAttribute("name", "priority_level");
 
   const durationLabel = document.createElement("label");
