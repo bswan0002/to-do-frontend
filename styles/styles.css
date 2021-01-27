@@ -16,6 +16,11 @@
   margin: 0 auto !important;
 }
 
+.jsCalendar tbody td {
+  text-align: center;
+  position: relative;
+}
+
 .jsCalendar.clean-theme thead .jsCalendar-title-name {
   font-weight: bold;
 }
