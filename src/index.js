@@ -168,6 +168,27 @@ function handleDate(date) {
   let day = time[2].slice(0, 2);
   return `${month}-${day}-${year}`;
 }
+
+function handleDateForBars(date) {
+  const months = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December",
+  };
+
+  let dateArr = handleDate(date).split("-");
+  return [dateArr[1], months[dateArr[0]], dateArr[2]];
+}
+
 function handleEditTask(event, task) {
   document.getElementById("task_form").innerHTML = "";
   renderTaskForm(event.target.dataset.id, task);
@@ -220,6 +241,9 @@ function renderTask(task) {
   if (document.querySelector(`[data-id="${task.id}"]`) === null) {
     li = document.createElement("li");
     li.dataset.id = task.id;
+    li.dataset.date = `${handleDateForBars(task.due_date)}`;
+    li.dataset.duration = task.duration;
+    li.dataset.priority = task.priority_level;
     li.className = "list-group-item";
     ul.appendChild(li);
   } else {
@@ -239,6 +263,7 @@ function renderTask(task) {
   editBTN.addEventListener("click", (e) => handleEditTask(e, task));
   li.append(editBTN, deleteBTN);
 }
+
 function renderTaskForm(user_id, task = null) {
   const page = document.querySelector(".container");
   let outerDiv;
@@ -486,4 +511,33 @@ function addMonthEvent() {
 
   navLeft.addEventListener("click", renderDurationBar);
   navRight.addEventListener("click", renderDurationBar);
+}
+
+function renderCalDurations() {
+  tasks = tasksObjHelper();
+  for (const date in tasks) {
+    let splitDate = date.split(",");
+    if (splitDate[1]) {
+    }
+  }
+}
+
+function tasksObjHelper() {
+  const taskList = document.querySelectorAll("#task-list li");
+  let tasks = {};
+  taskList.forEach((li) => {
+    if (tasks[li.dataset.date]) {
+      tasks[li.dataset.date].push([
+        parseInt(li.dataset.duration),
+        li.dataset.priority,
+      ]);
+    } else {
+      tasks[li.dataset.date] = [];
+      tasks[li.dataset.date].push([
+        parseInt(li.dataset.duration),
+        li.dataset.priority,
+      ]);
+    }
+  });
+  return tasks;
 }
