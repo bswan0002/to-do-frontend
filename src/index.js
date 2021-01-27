@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderPage();
   renderCalendar();
+  setTimeout(renderDurationBar, 500);
 });
 
 // DOM
@@ -407,4 +408,25 @@ function renderCalendar() {
   calendar.className = "auto-jsCalendar clean-theme blue mt-4";
   calendar.dataset.monthFormat = "month YYYY";
   document.querySelector(".container").appendChild(calendar);
+}
+
+function renderDurationBar() {
+  // make svg
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+  let percentage = 10;
+  // make a simple rectangle
+  const bar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  bar.setAttribute("width", "100%");
+  bar.setAttribute("height", `${percentage}%`);
+  bar.setAttribute("y", `${92 * (1 - percentage / 100)}`);
+  bar.setAttribute("fill", "red");
+  bar.setAttribute("fill-opacity", "0.5");
+  svg.appendChild(bar);
+  document.body.appendChild(svg);
+  // put bar in cal
+  const dayOne = Array.from(document.querySelectorAll("tbody td")).find(
+    (el) => el.textContent === "1"
+  );
+  dayOne.appendChild(svg);
 }
