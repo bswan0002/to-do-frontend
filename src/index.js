@@ -25,6 +25,8 @@ function postUser(e) {
         renderTaskForm(user.id);
         renderTaskList(user);
         updateHeader();
+        renderNoteForm(user.id);
+        renderNoteList(user);
       } else {
         alert("Username already taken");
       }
@@ -42,6 +44,8 @@ function getUser(e) {
         renderTaskForm(user.id);
         renderTaskList(user);
         updateHeader();
+        renderNoteForm(user.id);
+        renderNoteList(user);
       } else {
         alert("Invalid Username");
       }
@@ -113,7 +117,7 @@ function deleteTask(event) {
   ).then(event.target.parentElement.remove());
 }
 
-function postNote(e) {
+function postNote(e, user_id) {
   e.preventDefault();
   fetch("http://localhost:3000/notes", {
     method: "POST",
@@ -122,44 +126,52 @@ function postNote(e) {
       Accept: "application/json",
     },
     body: JSON.stringify({
-      title: e.target,
-      body: e.target,
-      user_id: e.target,
+      title: e.target.title.value,
+      body: e.target.body.value,
+      user_id: user_id,
     }),
   })
     .then((resp) => resp.json())
-    .then((user) => console.log(user))
+    .then((note) => renderNote(note))
+    .then(() => {
+      noteForm = document.getElementById("note_form");
+      noteForm.querySelector("form").reset();
+    })
     .catch((error) => console.log(error));
 }
 
-function updateNote(e) {
+function updateNote(e, note) {
   e.preventDefault();
-  fetch(`http://localhost:3000/notes/${e.id}`, {
+  fetch(`http://localhost:3000/notes/${note.id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
     body: JSON.stringify({
-      title: e.target,
-      body: e.target,
-      user_id: e.target,
+      title: e.target.title.value,
+      body: e.target.body.value,
+      user_id: note.user_id,
     }),
   })
     .then((resp) => resp.json())
-    .then((user) => console.log(user))
+    .then((note) => {
+      renderNoteForm(note.user_id);
+      updateNoteDOM(note);
+    })
     .catch((error) => console.log(error));
 }
 
-function deleteNote(note) {
+function deleteNote(e, note) {
   fetch(`http://localhost:3000/notes/${note.id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-  });
+  }).then(e.target.parentElement.parentElement.parentElement.remove());
 }
+
 // HANDLERS
 function handleDate(date) {
   let time = date.split("-");
@@ -176,6 +188,9 @@ function handleEditTask(event, task) {
 function handleReloadPage() {
   location.reload();
 }
+function handleEditNote(note) {
+  renderNoteForm(note.user_id, note);
+}
 // LISTENERS
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -187,6 +202,143 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // DOM
+function updateNoteDOM(note) {
+  let noteDiv = document.querySelector(`[data-note_id="${note.id}"]`);
+  let titleEle = noteDiv.firstChild;
+  titleEle.textContent = note.title;
+  let bodyEle = noteDiv.lastChild.querySelector("p");
+  bodyEle.textContent = note.body;
+  noteDiv.querySelector("button.btn-success").remove();
+  let newEditButton = document.createElement("button");
+  newEditButton.className = "btn btn-success";
+  newEditButton.textContent = "Edit";
+  newEditButton.addEventListener("click", () => handleEditNote(note));
+  let deleteButton = noteDiv.querySelector("button.btn-danger");
+  deleteButton.parentElement.insertBefore(newEditButton, deleteButton);
+}
+
+function renderNoteForm(user_id, note = null) {
+  const page = document.querySelector(".container");
+  let outerDiv;
+  let innerDiv;
+  if (document.querySelector("#note-container") === null) {
+    outerDiv = document.createElement("div");
+    outerDiv.setAttribute("class", "row justify-content-around");
+    outerDiv.id = "note-container";
+    innerDiv = document.createElement("div");
+    innerDiv.className = "col-md";
+    innerDiv.id = "note_form";
+  } else {
+    outerDiv = document.querySelector("#note-container");
+    innerDiv = document.getElementById("note_form");
+    innerDiv.firstChild.remove();
+  }
+  const form = document.createElement("form");
+  form.className = "mt-4";
+  const formDiv = document.createElement("div");
+
+  const formTitle = document.createElement("h2");
+  formTitle.textContent = note === null ? "Create New Note" : "Edit Note";
+
+  const titleLabel = document.createElement("label");
+  titleLabel.className = "form-label";
+  titleLabel.innerText = "Title";
+
+  const titleInput = document.createElement("input");
+  titleInput.className = "form-control mb-2";
+  titleInput.setAttribute("name", "title");
+
+  const bodyLabel = document.createElement("label");
+  bodyLabel.className = "form-label";
+  bodyLabel.innerText = "Body";
+
+  const bodyInput = document.createElement("textarea");
+  bodyInput.className = "form-control mb-2";
+  bodyInput.setAttribute("name", "body");
+
+  const submit = document.createElement("button");
+  submit.className = "btn btn-primary";
+  submit.innerText = "Submit";
+  form.addEventListener("submit", (e) => {
+    note === null ? postNote(e, user_id) : updateNote(e, note);
+  });
+  form.append(
+    formDiv,
+    formTitle,
+    titleLabel,
+    titleInput,
+    bodyLabel,
+    bodyInput,
+    submit
+  );
+  innerDiv.appendChild(form);
+  let list = document.getElementById("note-div");
+  if (note !== null) {
+    titleInput.value = note.title;
+    bodyInput.value = note.body;
+  }
+  if (list !== null) {
+    outerDiv.insertBefore(innerDiv, list);
+  } else {
+    outerDiv.appendChild(innerDiv);
+    page.appendChild(outerDiv);
+  }
+}
+
+function renderNoteList(user) {
+  const div = document.querySelector("#note-container");
+  const innerDiv = document.createElement("div");
+  innerDiv.className = "col-md mt-4";
+  innerDiv.id = "note-div";
+  const header = document.createElement("h2");
+  header.textContent = "Note List";
+  const noteList = document.createElement("div");
+  noteList.id = "note-list";
+  noteList.className = "list-group overflow-auto";
+  innerDiv.append(header, noteList);
+  div.appendChild(innerDiv);
+  user.notes.forEach((note) => {
+    renderNote(note);
+  });
+}
+
+function renderNote(note) {
+  let outerDiv = document.createElement("div");
+  outerDiv.className = "accordion";
+  outerDiv.dataset.note_id = note.id;
+  let button = document.createElement("button");
+  button.textContent = note.title;
+  button.className = "accordion__button";
+  button.addEventListener("click", () => {
+    const accordionContent = button.nextElementSibling;
+    button.classList.toggle("accordion__button--active");
+    if (button.classList.contains("accordion__button--active")) {
+      accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+    } else {
+      accordionContent.style.maxHeight = 0;
+    }
+  });
+  let innerDiv = document.createElement("div");
+  innerDiv.className = "accordion__content";
+  let p = document.createElement("p");
+  p.textContent = note.body;
+  let deleteBTN = document.createElement("button");
+  deleteBTN.textContent = "Delete";
+  deleteBTN.className = "btn btn-danger";
+  deleteBTN.addEventListener("click", (e) => deleteNote(e, note));
+  let editBTN = document.createElement("button");
+  editBTN.textContent = "Edit";
+  editBTN.className = "btn btn-success";
+  editBTN.addEventListener("click", () => handleEditNote(note));
+  let buttonDiv = document.createElement("div");
+  buttonDiv.className = "button__seperate";
+  buttonDiv.append(editBTN, deleteBTN);
+  innerDiv.append(p, buttonDiv);
+  outerDiv.append(button, innerDiv);
+  noteList = document.getElementById("note-list");
+  noteList.appendChild(outerDiv);
+}
+
 function updateHeader() {
   document.querySelector("ul.nav").children[0].remove();
   let signOut = document.querySelector("ul.nav").firstChild;
@@ -197,8 +349,9 @@ function updateHeader() {
   button.addEventListener("click", handleReloadPage);
   signOut.appendChild(button);
 }
+
 function renderTaskList(user) {
-  const div = document.querySelector(".justify-content-around");
+  const div = document.querySelector("#task-container");
   const innerDiv = document.createElement("div");
   innerDiv.className = "col-md mt-4";
   innerDiv.id = "task-div";
@@ -243,14 +396,15 @@ function renderTaskForm(user_id, task = null) {
   const page = document.querySelector(".container");
   let outerDiv;
   let innerDiv;
-  if (document.querySelector(".justify-content-around") === null) {
+  if (document.querySelector("#task-container") === null) {
     outerDiv = document.createElement("div");
     outerDiv.setAttribute("class", "row justify-content-around");
+    outerDiv.id = "task-container";
     innerDiv = document.createElement("div");
     innerDiv.className = "col-md";
     innerDiv.id = "task_form";
   } else {
-    outerDiv = document.querySelector(".justify-content-around");
+    outerDiv = document.querySelector("#task-container");
     innerDiv = document.getElementById("task_form");
   }
   const form = document.createElement("form");
