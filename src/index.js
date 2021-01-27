@@ -1,8 +1,8 @@
 // Global Variables
 let colors = {
-  High: "rgba(255, 0, 0, .5)",
-  Medium: "rgba(255, 165, 0, 0.5)",
-  Low: "rgba(255, 255, 0, 0.5)",
+  High: "rgba(160, 32, 240, 0.65)",
+  Medium: "rgba(0, 60, 255, 0.65)",
+  Low: "rgba(0, 140, 0, 0.65)",
 };
 // FETCH
 
@@ -453,8 +453,7 @@ function renderDurationBar() {
   highBar.setAttribute("width", "100%");
   highBar.setAttribute("height", `${highPercentage}%`);
   highBar.setAttribute("y", `${92 * (1 - highPercentage / 100)}`);
-  highBar.setAttribute("fill", "purple");
-  highBar.setAttribute("fill-opacity", "0.6");
+  highBar.setAttribute("fill", `${colors["High"]}`);
 
   medBar.setAttribute("width", "100%");
   medBar.setAttribute("height", `${medPercentage}%`);
@@ -462,8 +461,7 @@ function renderDurationBar() {
     "y",
     `${92 * (1 - (highPercentage + medPercentage) / 100)}`
   );
-  medBar.setAttribute("fill", "blue");
-  medBar.setAttribute("fill-opacity", "0.6");
+  medBar.setAttribute("fill", `${colors["Medium"]}`);
 
   lowBar.setAttribute("width", "100%");
   lowBar.setAttribute("height", `${lowPercentage}%`);
@@ -471,8 +469,7 @@ function renderDurationBar() {
     "y",
     `${92 * (1 - (highPercentage + medPercentage + lowPercentage) / 100)}`
   );
-  lowBar.setAttribute("fill", "green");
-  lowBar.setAttribute("fill-opacity", "0.6");
+  lowBar.setAttribute("fill", `${colors["Low"]}`);
 
   svg.append(highBar, medBar, lowBar);
   document.body.appendChild(svg);
