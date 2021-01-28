@@ -10,6 +10,10 @@
   color: #44c744;
 }
 
+.col-md {
+  max-width: 660px;
+}
+
 #task-list {
   max-height: 405px;
 }
