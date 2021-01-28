@@ -31,8 +31,10 @@
     <script>
       function layoutHandler() {
         const styleLink = document.getElementById("cal-style");
-        if (window.innerWidth < 1000) {
+        if (window.innerWidth < 992) {
           styleLink.setAttribute("href", "styles/mobile-cal.css");
+        } else if (window.innerWidth >= 992 && window.innerWidth < 1200) {
+          styleLink.setAttribute("href", "styles/med-cal.css");
         } else {
           styleLink.setAttribute("href", "styles/big-cal.css");
         }

@@ -28,6 +28,7 @@ function postUser(e) {
         renderNoteForm(user.id);
         renderNoteList(user);
         renderCalDurations();
+        renderTodaysTaskList();
       } else {
         alert("Username already taken");
       }
@@ -48,6 +49,7 @@ function getUser(e) {
         renderNoteForm(user.id);
         renderNoteList(user);
         renderCalDurations();
+        renderTodaysTaskList();
       } else {
         alert("Invalid Username");
       }
@@ -119,7 +121,12 @@ function deleteTask(event) {
       },
     }
   ).then(() => {
-    event.target.parentElement.parentElement.parentElement.remove();
+    const tasks = document.querySelectorAll(
+      `[data-id='${event.target.parentElement.parentElement.parentElement.dataset.id}']`
+    );
+    tasks.forEach((task) => {
+      task.remove();
+    });
     updateDurationBars();
   });
 }
@@ -389,6 +396,40 @@ function updateHeader() {
   signOut.appendChild(button);
 }
 
+function renderTodaysTaskList() {
+  const col = document.createElement("div");
+  col.className = "col-4";
+  col.id = "todays-tasks-container";
+
+  const header = document.createElement("h2");
+  header.innerHTML = "Today's<span class = 'white'>z</span>Tasks";
+
+  const ul = document.createElement("ul");
+  ul.id = "todays-task-list";
+  ul.className = "list-group overflow-auto";
+
+  col.append(header, ul);
+  document.querySelector(".calendar-row").appendChild(col);
+  renderDaysTasks();
+}
+
+// we need lis inside #task-list
+function renderDaysTasks(day = null) {
+  const taskList = document.querySelector("#todays-task-list");
+  if (day === null) {
+    const todaysDate = handleDateForBars(new Date().toJSON()).join(",");
+    const tasks = document.querySelectorAll(`[data-date='${todaysDate}']`);
+    tasks.forEach((task) => {
+      taskClone = task.cloneNode(true);
+      addExpandable(taskClone.querySelector(".accordion__button"));
+      taskClone
+        .querySelector("#delete-btn")
+        .addEventListener("click", deleteTask);
+      taskList.appendChild(taskClone);
+    });
+  }
+}
+
 function renderTaskList(user) {
   const div = document.querySelector("#task-container");
   const innerDiv = document.createElement("div");
@@ -450,6 +491,7 @@ function renderTask(task) {
   const deleteBTN = document.createElement("button");
   const editBTN = document.createElement("button");
   deleteBTN.textContent = "Delete";
+  deleteBTN.id = "delete-btn";
   deleteBTN.className = "btn btn-outline-dark mb-2";
   deleteBTN.addEventListener("click", deleteTask);
   editBTN.textContent = "Edit";
@@ -461,10 +503,14 @@ function renderTask(task) {
   buttonDiv.append(editBTN, deleteBTN);
   innerDiv.append(p, buttonDiv);
   li.append(titleButton, innerDiv);
-  titleButton.addEventListener("click", () => {
-    const accordionContent = titleButton.nextElementSibling;
-    titleButton.classList.toggle("accordion__button--active");
-    if (titleButton.classList.contains("accordion__button--active")) {
+  addExpandable(titleButton);
+}
+
+function addExpandable(button) {
+  button.addEventListener("click", () => {
+    const accordionContent = button.nextElementSibling;
+    button.classList.toggle("accordion__button--active");
+    if (button.classList.contains("accordion__button--active")) {
       accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
     } else {
       accordionContent.style.maxHeight = 0;
@@ -571,7 +617,7 @@ function renderTaskForm(user_id, task = null) {
   form.addEventListener("submit", (e) => {
     task === null ? postTask(e, user_id) : updateTask(e, user_id, task.id);
   });
-  const calendar = document.querySelector(".auto-jsCalendar");
+  const calendar = document.querySelector(".calendar-row");
   innerDiv.appendChild(form);
   let task_list = document.querySelector("#task-list");
   task_list === null ? outerDiv.appendChild(innerDiv) : null;
@@ -649,7 +695,7 @@ function renderSignUp(e) {
       getUser(event);
     }
   });
-  const calendar = document.querySelector(".auto-jsCalendar");
+  const calendar = document.querySelector(".calendar-row");
   formDiv.append(formTitle, uLabel, uInput, submit);
   form.appendChild(formDiv);
   page.insertBefore(form, calendar);
@@ -664,9 +710,14 @@ function renderPage() {
 
 function renderCalendar() {
   const calendar = document.createElement("div");
-  calendar.className = "auto-jsCalendar clean-theme blue mt-4";
+  calendar.className = "auto-jsCalendar clean-theme blue mt-4 col-8";
   calendar.dataset.monthFormat = "month YYYY";
-  document.querySelector(".container").appendChild(calendar);
+
+  const calendarRow = document.createElement("div");
+  calendarRow.className = "row calendar-row justify-content-around";
+  calendarRow.appendChild(calendar);
+
+  document.querySelector(".container").appendChild(calendarRow);
 }
 
 function updateDurationBars() {

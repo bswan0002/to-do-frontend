@@ -1,0 +1,26 @@
+.jsCalendar.clean-theme table {
+  background-color: transparent;
+  box-shadow: none;
+  color: #000000;
+  font-family: "Century Gothic", CenturyGothic, AppleGothic, sans-serif;
+  width: 525px;
+}
+
+.jsCalendar.clean-theme thead .jsCalendar-week-days th,
+.jsCalendar.clean-theme tbody td {
+  border-radius: unset;
+  font-size: 14px;
+  height: 100px;
+  line-height: 42px;
+  margin: 2px 2px;
+  width: 75px;
+}
+
+svg {
+  height: 92px;
+  width: 15px;
+  position: absolute;
+  right: 3px;
+  bottom: 2px;
+  z-index: -1;
+}

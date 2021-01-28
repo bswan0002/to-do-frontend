@@ -14,6 +14,14 @@
   font-family: "Duru Sans", sans-serif;
 }
 
+#todays-tasks-container {
+  min-width: 240px;
+}
+
+.white {
+  color: white;
+}
+
 .col-md {
   max-width: 660px;
 }
@@ -23,6 +31,10 @@
 }
 
 #task-list li {
+  padding: 0px;
+}
+
+#todays-task-list li {
   padding: 0px;
 }
 
