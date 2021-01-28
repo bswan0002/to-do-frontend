@@ -10,6 +10,10 @@
   color: #44c744;
 }
 
+.container {
+  font-family: "Duru Sans", sans-serif;
+}
+
 .col-md {
   max-width: 660px;
 }
@@ -52,6 +56,11 @@
   float: right;
   transform: scale(1.5);
 }
+
+#task-list .accordion__button--active {
+  opacity: 0.8;
+}
+
 .accordion__button--active {
   background: #555555;
 }

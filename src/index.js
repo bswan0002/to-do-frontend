@@ -1,6 +1,6 @@
 // Global Variables
 let colors = {
-  High: "#c16df5",
+  High: "#b246f4",
   Medium: "#5980ff",
   Low: "#59b459",
 };
