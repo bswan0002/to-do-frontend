@@ -18,9 +18,8 @@
   max-height: 384px;
 }
 
-.button__sperate {
-  display: flex;
-  justify-content: space-between;
+#task-list li {
+  padding: 0px;
 }
 
 .accordion__button {

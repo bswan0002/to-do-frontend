@@ -1,8 +1,8 @@
 // Global Variables
 let colors = {
-  High: "rgba(160, 32, 240, 0.65)",
-  Medium: "rgba(0, 60, 255, 0.65)",
-  Low: "rgba(0, 140, 0, 0.65)",
+  High: "#c16df5",
+  Medium: "#5980ff",
+  Low: "#59b459",
 };
 // FETCH
 
@@ -106,7 +106,7 @@ function updateTask(e, user_id, task_id) {
 
 function deleteTask(event) {
   fetch(
-    `http://localhost:3000/tasks/${event.target.parentElement.dataset.id}`,
+    `http://localhost:3000/tasks/${event.target.parentElement.parentElement.parentElement.dataset.id}`,
     {
       method: "DELETE",
       headers: {
@@ -114,7 +114,7 @@ function deleteTask(event) {
         Accept: "application/json",
       },
     }
-  ).then(event.target.parentElement.remove());
+  ).then(event.target.parentElement.parentElement.parentElement.remove());
 }
 
 function postNote(e, user_id) {
@@ -192,9 +192,9 @@ function handleDateForBars(date) {
     "07": "July",
     "08": "August",
     "09": "September",
-    "10": "October",
-    "11": "November",
-    "12": "December",
+    10: "October",
+    11: "November",
+    12: "December",
   };
 
   let dateArr = handleDate(date).split("-");
@@ -211,6 +211,18 @@ function handleReloadPage() {
 }
 function handleEditNote(note) {
   renderNoteForm(note.user_id, note);
+}
+
+function handleDuration(duration) {
+  let hours = 0;
+  while (duration >= 60) {
+    duration = duration - 60;
+    hours += 1;
+  }
+  if (duration.toString().length == 1) {
+    duration = `${0}${duration}`;
+  }
+  return `${hours}:${duration}`;
 }
 // LISTENERS
 
@@ -345,14 +357,14 @@ function renderNote(note) {
   p.textContent = note.body;
   let deleteBTN = document.createElement("button");
   deleteBTN.textContent = "Delete";
-  deleteBTN.className = "btn btn-danger";
+  deleteBTN.className = "btn btn-danger mb-2";
   deleteBTN.addEventListener("click", (e) => deleteNote(e, note));
   let editBTN = document.createElement("button");
   editBTN.textContent = "Edit";
-  editBTN.className = "btn btn-success";
+  editBTN.className = "btn btn-success mb-2";
   editBTN.addEventListener("click", () => handleEditNote(note));
   let buttonDiv = document.createElement("div");
-  buttonDiv.className = "button__seperate";
+  buttonDiv.className = "d-flex justify-content-between";
   buttonDiv.append(editBTN, deleteBTN);
   innerDiv.append(p, buttonDiv);
   outerDiv.append(button, innerDiv);
@@ -403,18 +415,54 @@ function renderTask(task) {
     li = document.querySelector(`[data-id="${task.id}"]`);
     li.innerHTML = "";
   }
-  li.textContent = `${task.title} | ${handleDate(task.due_date)}`;
+
+  let row = document.createElement("div");
+  row.className = "row";
+  let title = document.createElement("div");
+  title.className = "col-4";
+  title.textContent = task.title;
+  let duration = document.createElement("div");
+  duration.className = "col-4";
+  duration.textContent = handleDuration(task.duration);
+  let date = document.createElement("div");
+  date.className = "col-4";
+  date.textContent = handleDate(task.due_date);
+  row.append(title, date, duration);
+
+  let titleButton = document.createElement("button");
+  titleButton.className = "accordion__button";
+  // titleButton.textContent = `${task.title} | ${handleDate(task.due_date)}`;
   li.style.backgroundColor = `${colors[task.priority_level]}`;
+  titleButton.style.backgroundColor = `${colors[task.priority_level]}`;
+  titleButton.appendChild(row);
+  let innerDiv = document.createElement("div");
+  innerDiv.className = "accordion__content";
+  let p = document.createElement("p");
+  p.textContent = task.description;
+
   const deleteBTN = document.createElement("button");
   const editBTN = document.createElement("button");
   deleteBTN.textContent = "Delete";
-  deleteBTN.className = "btn btn-danger";
+  deleteBTN.className = "btn btn-outline-dark mb-2";
   deleteBTN.addEventListener("click", deleteTask);
   editBTN.textContent = "Edit";
   editBTN.dataset.id = task.user_id;
-  editBTN.className = "btn btn-success";
+  editBTN.className = "btn btn-outline-dark mb-2";
   editBTN.addEventListener("click", (e) => handleEditTask(e, task));
-  li.append(editBTN, deleteBTN);
+  let buttonDiv = document.createElement("div");
+  buttonDiv.className = "d-flex justify-content-between";
+  buttonDiv.append(editBTN, deleteBTN);
+  innerDiv.append(p, buttonDiv);
+  li.append(titleButton, innerDiv);
+  titleButton.addEventListener("click", () => {
+    const accordionContent = titleButton.nextElementSibling;
+    titleButton.classList.toggle("accordion__button--active");
+    if (titleButton.classList.contains("accordion__button--active")) {
+      accordionContent.style.maxHeight = accordionContent.scrollHeight + "px";
+    } else {
+      accordionContent.style.maxHeight = 0;
+    }
+  });
 }
 
 function renderTaskForm(user_id, task = null) {
@@ -451,7 +499,7 @@ function renderTaskForm(user_id, task = null) {
   descriptionLabel.className = "form-label";
   descriptionLabel.innerText = "Description";
 
-  const descriptionInput = document.createElement("input");
+  const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "form-control mb-2";
   descriptionInput.setAttribute("name", "description");
 
