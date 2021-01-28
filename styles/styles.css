@@ -10,16 +10,25 @@
   color: #44c744;
 }
 
-.justify-content-around {
-  /* max-height: 60vh; */
-}
-
 #task-list {
-  max-height: 384px;
+  max-height: 405px;
 }
 
 #task-list li {
   padding: 0px;
+}
+
+#note_form textarea.form-control {
+  height: 191px;
+}
+
+#note-list {
+  background-color: lightgrey;
+  max-height: 350px;
+}
+
+.accordion {
+  padding-bottom: 1px;
 }
 
 .accordion__button {

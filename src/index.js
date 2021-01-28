@@ -27,6 +27,7 @@ function postUser(e) {
         updateHeader();
         renderNoteForm(user.id);
         renderNoteList(user);
+        renderCalDurations();
       } else {
         alert("Username already taken");
       }
@@ -46,6 +47,7 @@ function getUser(e) {
         updateHeader();
         renderNoteForm(user.id);
         renderNoteList(user);
+        renderCalDurations();
       } else {
         alert("Invalid Username");
       }
@@ -74,6 +76,7 @@ function postTask(e, user_id) {
     .then((task) => {
       task.id !== null ? renderTask(task) : alert("Invalid Task Submission");
       e.target.reset();
+      updateDurationBars();
     })
     .catch((error) => console.log(error));
 }
@@ -100,6 +103,7 @@ function updateTask(e, user_id, task_id) {
     .then((task) => {
       console.log(task);
       renderTask(task);
+      updateDurationBars();
     })
     .catch((error) => console.log(error));
 }
@@ -114,7 +118,10 @@ function deleteTask(event) {
         Accept: "application/json",
       },
     }
-  ).then(event.target.parentElement.parentElement.parentElement.remove());
+  ).then(() => {
+    event.target.parentElement.parentElement.parentElement.remove();
+    updateDurationBars();
+  });
 }
 
 function postNote(e, user_id) {
@@ -230,7 +237,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHeader();
   renderPage();
   renderCalendar();
-  setTimeout(renderDurationBar, 500);
   setTimeout(addMonthEvent, 500);
 });
 
@@ -256,7 +262,7 @@ function renderNoteForm(user_id, note = null) {
   let innerDiv;
   if (document.querySelector("#note-container") === null) {
     outerDiv = document.createElement("div");
-    outerDiv.setAttribute("class", "row justify-content-around");
+    outerDiv.setAttribute("class", "row justify-content-around mb-4");
     outerDiv.id = "note-container";
     innerDiv = document.createElement("div");
     innerDiv.className = "col-md";
@@ -406,9 +412,6 @@ function renderTask(task) {
   if (document.querySelector(`[data-id="${task.id}"]`) === null) {
     li = document.createElement("li");
     li.dataset.id = task.id;
-    li.dataset.date = `${handleDateForBars(task.due_date)}`;
-    li.dataset.duration = task.duration;
-    li.dataset.priority = task.priority_level;
     li.className = "list-group-item";
     ul.appendChild(li);
   } else {
@@ -431,7 +434,11 @@ function renderTask(task) {
 
   let titleButton = document.createElement("button");
   titleButton.className = "accordion__button";
-  // titleButton.textContent = `${task.title} | ${handleDate(task.due_date)}`;
+
+  li.dataset.date = `${handleDateForBars(task.due_date)}`;
+  li.dataset.duration = task.duration;
+  li.dataset.priority = task.priority_level;
+
   li.style.backgroundColor = `${colors[task.priority_level]}`;
   titleButton.style.backgroundColor = `${colors[task.priority_level]}`;
   titleButton.appendChild(row);
@@ -662,13 +669,18 @@ function renderCalendar() {
   document.querySelector(".container").appendChild(calendar);
 }
 
-function renderDurationBar() {
+function updateDurationBars() {
+  const bars = document.querySelectorAll("svg");
+  bars.forEach((bar) => {
+    bar.remove();
+  });
+  renderCalDurations();
+}
+
+function renderDurationBar(day, hiP, medP, lowP) {
   // make svg
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-  let highPercentage = 10;
-  let medPercentage = 15;
-  let lowPercentage = 35;
   // make rectangles
   const highBar = document.createElementNS(
     "http://www.w3.org/2000/svg",
@@ -678,50 +690,66 @@ function renderDurationBar() {
   const lowBar = document.createElementNS("http://www.w3.org/2000/svg", "rect");
 
   highBar.setAttribute("width", "100%");
-  highBar.setAttribute("height", `${highPercentage}%`);
-  highBar.setAttribute("y", `${92 * (1 - highPercentage / 100)}`);
+  highBar.setAttribute("height", `${hiP}%`);
+  highBar.setAttribute("y", `${92 * (1 - hiP / 100)}`);
   highBar.setAttribute("fill", `${colors["High"]}`);
 
   medBar.setAttribute("width", "100%");
-  medBar.setAttribute("height", `${medPercentage}%`);
-  medBar.setAttribute(
-    "y",
-    `${92 * (1 - (highPercentage + medPercentage) / 100)}`
-  );
+  medBar.setAttribute("height", `${medP}%`);
+  medBar.setAttribute("y", `${92 * (1 - (hiP + medP) / 100)}`);
   medBar.setAttribute("fill", `${colors["Medium"]}`);
 
   lowBar.setAttribute("width", "100%");
-  lowBar.setAttribute("height", `${lowPercentage}%`);
-  lowBar.setAttribute(
-    "y",
-    `${92 * (1 - (highPercentage + medPercentage + lowPercentage) / 100)}`
-  );
+  lowBar.setAttribute("height", `${lowP}%`);
+  lowBar.setAttribute("y", `${92 * (1 - (hiP + medP + lowP) / 100)}`);
   lowBar.setAttribute("fill", `${colors["Low"]}`);
 
   svg.append(highBar, medBar, lowBar);
-  document.body.appendChild(svg);
   // put bar in cal
-  const dayOne = Array.from(document.querySelectorAll("tbody td")).find(
-    (el) => el.textContent === "26"
+  const targetDay = Array.from(document.querySelectorAll("tbody td")).find(
+    (el) =>
+      el.className !== "jsCalendar-previous" &&
+      parseInt(el.textContent) === parseInt(day)
   );
-  dayOne.appendChild(svg);
+  targetDay.appendChild(svg);
 }
 
 function addMonthEvent() {
   const navLeft = document.querySelector(".jsCalendar-nav-left");
   const navRight = document.querySelector(".jsCalendar-nav-right");
 
-  navLeft.addEventListener("click", renderDurationBar);
-  navRight.addEventListener("click", renderDurationBar);
+  navLeft.addEventListener("click", renderCalDurations);
+  navRight.addEventListener("click", renderCalDurations);
 }
 
 function renderCalDurations() {
-  tasks = tasksObjHelper();
+  const tasks = tasksObjHelper();
+  const calDate = document
+    .querySelector(".jsCalendar-title-name")
+    .innerText.split(" ");
   for (const date in tasks) {
-    let splitDate = date.split(",");
-    if (splitDate[1]) {
+    let taskDate = date.split(",");
+    // check if task date matches calendar date
+    if (taskDate[1] === calDate[0] && taskDate[2] === calDate[1]) {
+      renderDurationBar(
+        taskDate[0],
+        calcBarPct(tasks[date], "High"),
+        calcBarPct(tasks[date], "Medium"),
+        calcBarPct(tasks[date], "Low")
+      );
     }
   }
+}
+
+// each task in tasks looks like: [60, "High"]
+function calcBarPct(tasks, priority) {
+  let pct = 0;
+  tasks.forEach((task) => {
+    if (task[1] === priority) {
+      pct += task[0] / 9.6;
+    }
+  });
+  return pct;
 }
 
 function tasksObjHelper() {
