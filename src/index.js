@@ -28,7 +28,7 @@ function postUser(e) {
         renderNoteForm(user.id);
         renderNoteList(user);
         renderCalDurations();
-        renderTodaysTaskList();
+        renderTodaysTaskList(user);
       } else {
         alert("Username already taken");
       }
@@ -42,6 +42,7 @@ function getUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user) {
+        // console.log(user);
         document.querySelector("form").remove();
         renderTaskForm(user.id);
         renderTaskList(user);
@@ -49,7 +50,7 @@ function getUser(e) {
         renderNoteForm(user.id);
         renderNoteList(user);
         renderCalDurations();
-        renderTodaysTaskList();
+        renderTodaysTaskList(user);
       } else {
         alert("Invalid Username");
       }
@@ -76,8 +77,10 @@ function postTask(e, user_id) {
   })
     .then((resp) => resp.json())
     .then((task) => {
+      // console.log(task);
       task.id !== null ? renderTask(task) : alert("Invalid Task Submission");
       e.target.reset();
+      renderDaysTasks(task.user);
       updateDurationBars();
     })
     .catch((error) => console.log(error));
@@ -103,9 +106,10 @@ function updateTask(e, user_id, task_id) {
   })
     .then((resp) => resp.json())
     .then((task) => {
-      console.log(task);
+      // console.log(task);
       renderTask(task);
       updateDurationBars();
+      renderDaysTasks(task.user);
     })
     .catch((error) => console.log(error));
 }
@@ -253,6 +257,7 @@ function handleEditTask(event, task) {
 function handleReloadPage() {
   location.reload();
 }
+
 function handleEditNote(note) {
   renderNoteForm(note.user_id, note);
 }
@@ -426,7 +431,7 @@ function updateHeader() {
   signOut.appendChild(button);
 }
 
-function renderTodaysTaskList() {
+function renderTodaysTaskList(user) {
   const col = document.createElement("div");
   col.className = "col-4";
   col.id = "todays-tasks-container";
@@ -440,14 +445,35 @@ function renderTodaysTaskList() {
 
   col.append(header, ul);
   document.querySelector(".calendar-row").appendChild(col);
-  renderDaysTasks();
+  renderDaysTasks(user);
 }
-
+function handleDate3(date) {
+  const months = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+  };
+  let month = months[date[0]];
+  let day = date[1];
+  let year = date[2];
+  return `${day},${month},${year}`;
+}
 // we need lis inside #task-list
-function renderDaysTasks(day = null) {
+function renderDaysTasks(user, day = null) {
   const taskList = document.querySelector("#todays-task-list");
+  taskList.innerHTML = "";
   if (day === null) {
-    const todaysDate = handleDateForBars(new Date().toJSON()).join(",");
+    let formatDate = new Date();
+    let todaysDate = handleDate3(formatDate.toLocaleDateString().split("/"));
     const tasks = document.querySelectorAll(`[data-date='${todaysDate}']`);
     tasks.forEach((task) => {
       taskClone = task.cloneNode(true);
@@ -455,6 +481,14 @@ function renderDaysTasks(day = null) {
       taskClone
         .querySelector("#delete-btn")
         .addEventListener("click", deleteTask);
+
+      let editTask = user.tasks.find(
+        (task) => task.id === parseInt(taskClone.dataset.id)
+      );
+      // debugger;
+      taskClone
+        .querySelector("#edit-btn")
+        .addEventListener("click", (e) => handleEditTask(e, editTask));
       taskList.appendChild(taskClone);
     });
   }
@@ -554,6 +588,8 @@ function renderTask(task) {
   deleteBTN.addEventListener("click", deleteTask);
   editBTN.textContent = "Edit";
   editBTN.dataset.id = task.user_id;
+  editBTN.dataset.task_id = task.id;
+  editBTN.id = "edit-btn";
   editBTN.className = "btn btn-outline-dark mb-2";
   editBTN.addEventListener("click", (e) => handleEditTask(e, task));
   let buttonDiv = document.createElement("div");
@@ -772,7 +808,7 @@ function renderCalendar() {
   calendar.dataset.monthFormat = "month YYYY";
 
   const calendarRow = document.createElement("div");
-  calendarRow.className = "row calendar-row justify-content-around";
+  calendarRow.className = "row calendar-row mt-3 justify-content-around";
   calendarRow.appendChild(calendar);
 
   document.querySelector(".container").appendChild(calendarRow);
