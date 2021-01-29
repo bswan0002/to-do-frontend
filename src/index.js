@@ -113,10 +113,12 @@ function updateTask(e, user_id, task_id) {
     })
     .catch((error) => console.log(error));
 }
-
+// event.target.closest(".list-group-item").dataset.id;
 function deleteTask(event) {
   fetch(
-    `http://localhost:3000/tasks/${event.target.parentElement.parentElement.parentElement.dataset.id}`,
+    `http://localhost:3000/tasks/${
+      event.target.closest(".list-group-item").dataset.id
+    }`,
     {
       method: "DELETE",
       headers: {
@@ -126,7 +128,7 @@ function deleteTask(event) {
     }
   ).then(() => {
     const tasks = document.querySelectorAll(
-      `[data-id='${event.target.parentElement.parentElement.parentElement.dataset.id}']`
+      `[data-id='${event.target.closest(".list-group-item").dataset.id}']`
     );
     tasks.forEach((task) => {
       task.remove();
@@ -187,7 +189,7 @@ function deleteNote(e, note) {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-  }).then(e.target.parentElement.parentElement.parentElement.remove());
+  }).then(e.target.closest(".accordion").remove());
 }
 
 // HANDLERS
@@ -218,9 +220,9 @@ function handleDateForBars(date) {
     "07": "July",
     "08": "August",
     "09": "September",
-    "10": "October",
-    "11": "November",
-    "12": "December",
+    10: "October",
+    11: "November",
+    12: "December",
   };
 
   let dateArr = handleDate(date).split("-");
@@ -230,18 +232,18 @@ function handleDateForBars(date) {
 // "22,January,2021" => "2021-01-22"
 function unhandleDate(date) {
   const months = {
-    "January": "01",
-    "February": "02",
-    "March": "03",
-    "April": "04",
-    "May": "05",
-    "June": "06",
-    "July": "07",
-    "August": "08",
-    "September": "09",
-    "October": "10",
-    "November": "11",
-    "December": "12",
+    January: "01",
+    February: "02",
+    March: "03",
+    April: "04",
+    May: "05",
+    June: "06",
+    July: "07",
+    August: "08",
+    September: "09",
+    October: "10",
+    November: "11",
+    December: "12",
   };
 
   let dateArr = date.split(",");
@@ -291,7 +293,7 @@ function updateNoteDOM(note) {
   bodyEle.textContent = note.body;
   noteDiv.querySelector("button.btn-success").remove();
   let newEditButton = document.createElement("button");
-  newEditButton.className = "btn btn-success";
+  newEditButton.className = "btn btn-success mb-2";
   newEditButton.textContent = "Edit";
   newEditButton.addEventListener("click", () => handleEditNote(note));
   let deleteButton = noteDiv.querySelector("button.btn-danger");
@@ -518,9 +520,9 @@ function indexFinder(task) {
   const tasks = Array.from(ul.querySelectorAll(".list-group-item"));
 
   const priorities = {
-    "High": 3,
-    "Medium": 2,
-    "Low": 1,
+    High: 3,
+    Medium: 2,
+    Low: 1,
   };
 
   return tasks.findIndex(function (t) {
