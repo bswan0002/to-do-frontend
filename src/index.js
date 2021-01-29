@@ -443,7 +443,8 @@ function renderTodaysTaskList(user) {
 
   const ul = document.createElement("ul");
   ul.id = "todays-task-list";
-  ul.className = "list-group overflow-auto";
+  ul.className =
+    "list-group overflow-auto border-top border-bottom border-start border-2 rounded-3";
 
   col.append(header, ul);
   document.querySelector(".calendar-row").appendChild(col);
@@ -507,7 +508,8 @@ function renderTaskList(user) {
   header.textContent = "Task List";
   const ul = document.createElement("ul");
   ul.id = "task-list";
-  ul.className = "list-group overflow-auto";
+  ul.className =
+    "list-group overflow-auto border-top border-bottom border-start border-2 rounded-3";
   innerDiv.append(header, ul);
   div.appendChild(innerDiv);
   user.tasks.forEach((task) => {

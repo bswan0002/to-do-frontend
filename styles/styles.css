@@ -28,6 +28,8 @@
 
 #task-list {
   max-height: 405px;
+  /* border-style: inset;
+  border-radius: 17px; */
 }
 
 #task-list li {
