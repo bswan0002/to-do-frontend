@@ -1,13 +1,14 @@
 .title {
-  font-family: "Inconsolata", monospace;
+  /* font-family: "Inconsolata", monospace; */
 }
 
-.orange {
-  color: #b963b9;
+#only {
+  font-family: "Montserrat", sans-serif;
+  color: black;
 }
 
-.blue {
-  color: #44c744;
+#tasks {
+  font-family: "Dancing Script", cursive;
 }
 
 .container {

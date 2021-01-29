@@ -732,7 +732,7 @@ function renderHeader() {
   const titleDiv = document.createElement("div");
   const title = document.createElement("h1");
   title.className = "title";
-  title.innerHTML = `<span class = "orange">await</span><span class = "blue"> noMore</span>();`;
+  title.innerHTML = `<span id = "only">Only</span><strong id = "tasks" style="color:${colors["Medium"]}">Tasks</strong>`;
   titleDiv.appendChild(title);
 
   const navUl = document.createElement("ul");
