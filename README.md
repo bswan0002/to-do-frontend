@@ -17,12 +17,13 @@ From the landing page you can choose to either Sign Up or Log In to your account
 ## Contributors
 
 Ben Swanson, bswan0002@gmail.com, https://github.com/bswan0002
+
 Taylor Bustamante, taylorbustamante16@gmail.com, https://github.com/tbustama
 
 ## Acknowledgements
 
 We would like to acknowledge https://gramthanos.github.io/jsCalendar/docs.html#getting-started for our use of their calendar on our application.
 
-##
+#### License
 
-License: MIT License, see https://spdx.org/licenses/MIT.html for details
+MIT License, see https://spdx.org/licenses/MIT.html for details
