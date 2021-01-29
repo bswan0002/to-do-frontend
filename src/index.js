@@ -195,6 +195,14 @@ function handleDate(date) {
   return `${month}-${day}-${year}`;
 }
 
+function handleDate2(date) {
+  let time = date.split("-");
+  let year = time[0];
+  let month = time[1];
+  let day = time[2].slice(0, 2);
+  return Date.parse(`${year}-${month}-${day}`);
+}
+
 function handleDateForBars(date) {
   const months = {
     "01": "January",
@@ -206,13 +214,35 @@ function handleDateForBars(date) {
     "07": "July",
     "08": "August",
     "09": "September",
-    10: "October",
-    11: "November",
-    12: "December",
+    "10": "October",
+    "11": "November",
+    "12": "December",
   };
 
   let dateArr = handleDate(date).split("-");
   return [dateArr[1], months[dateArr[0]], dateArr[2]];
+}
+
+// "22,January,2021" => "2021-01-22"
+function unhandleDate(date) {
+  const months = {
+    "January": "01",
+    "February": "02",
+    "March": "03",
+    "April": "04",
+    "May": "05",
+    "June": "06",
+    "July": "07",
+    "August": "08",
+    "September": "09",
+    "October": "10",
+    "November": "11",
+    "December": "12",
+  };
+
+  let dateArr = date.split(",");
+  dateArr[1] = months[dateArr[1]];
+  return Date.parse([dateArr[2], dateArr[1], dateArr[0]].join("-"));
 }
 
 function handleEditTask(event, task) {
@@ -430,6 +460,8 @@ function renderDaysTasks(day = null) {
   }
 }
 
+function sortTaskList() {}
+
 function renderTaskList(user) {
   const div = document.querySelector("#task-container");
   const innerDiv = document.createElement("div");
@@ -447,6 +479,28 @@ function renderTaskList(user) {
   });
 }
 
+function indexFinder(task) {
+  const ul = document.getElementById("task-list");
+  const tasks = Array.from(ul.querySelectorAll(".list-group-item"));
+
+  const priorities = {
+    "High": 3,
+    "Medium": 2,
+    "Low": 1,
+  };
+
+  return tasks.findIndex(function (t) {
+    if (handleDate2(task.due_date) < unhandleDate(t.dataset.date)) {
+      return true;
+    } else if (
+      handleDate2(task.due_date) <= unhandleDate(t.dataset.date) &&
+      priorities[task.priority_level] >= priorities[t.dataset.priority]
+    ) {
+      return true;
+    }
+  });
+}
+
 function renderTask(task) {
   const ul = document.getElementById("task-list");
   let li;
@@ -454,11 +508,15 @@ function renderTask(task) {
     li = document.createElement("li");
     li.dataset.id = task.id;
     li.className = "list-group-item";
-    ul.appendChild(li);
   } else {
     li = document.querySelector(`[data-id="${task.id}"]`);
     li.innerHTML = "";
   }
+
+  const tasks = ul.querySelectorAll(".list-group-item");
+  let i = indexFinder(task);
+
+  ul.insertBefore(li, tasks[i]);
 
   let row = document.createElement("div");
   row.className = "row";
