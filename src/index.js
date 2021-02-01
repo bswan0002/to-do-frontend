@@ -21,14 +21,7 @@ function postUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user.id) {
-        document.querySelector("form").remove();
-        renderTaskForm(user.id);
-        renderTaskList(user);
-        updateHeader();
-        renderNoteForm(user.id);
-        renderNoteList(user);
-        renderCalDurations();
-        renderTodaysTaskList(user);
+        logInRenderer(user);
       } else {
         alert("Username already taken");
       }
@@ -42,15 +35,7 @@ function getUser(e) {
     .then((resp) => resp.json())
     .then((user) => {
       if (user) {
-        // console.log(user);
-        document.querySelector("form").remove();
-        renderTaskForm(user.id);
-        renderTaskList(user);
-        updateHeader();
-        renderNoteForm(user.id);
-        renderNoteList(user);
-        renderCalDurations();
-        renderTodaysTaskList(user);
+        logInRenderer(user);
       } else {
         alert("Invalid Username");
       }
@@ -285,6 +270,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // DOM
+function logInRenderer(user) {
+  document.querySelector("form").remove();
+  renderTaskForm(user.id);
+  renderTaskList(user);
+  updateHeader();
+  renderNoteForm(user.id);
+  renderNoteList(user);
+  renderCalDurations();
+  renderTodaysTaskList(user);
+}
+
 function updateNoteDOM(note) {
   let noteDiv = document.querySelector(`[data-note_id="${note.id}"]`);
   let titleEle = noteDiv.firstChild;
@@ -496,8 +492,6 @@ function renderDaysTasks(user, day = null) {
     });
   }
 }
-
-function sortTaskList() {}
 
 function renderTaskList(user) {
   const div = document.querySelector("#task-container");
